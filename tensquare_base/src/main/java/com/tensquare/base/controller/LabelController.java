@@ -2,9 +2,11 @@ package com.tensquare.base.controller;
 
 import com.tensquare.base.pojo.Label;
 import com.tensquare.base.service.LabelService;
+import com.tensquare.common.domain.PageResult;
 import com.tensquare.common.domain.Result;
 import com.tensquare.common.domain.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/label")
+@CrossOrigin
 public class LabelController {
 
     @Autowired
@@ -94,5 +97,37 @@ public class LabelController {
         labelService.deleteById(labelId);
         return new Result(true, StatusCode.OK, "删除成功");
     }
+
+
+    /*
+     * @Author sirc_hzr
+     * @Description  TODO 根据条件查询标签内容
+     * @Date 10:07 2019/3/6
+     * @Param
+     * @return
+     **/
+
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    public Result findBySearch(@RequestBody Label label) {
+        List<Label> list = labelService.findBySearch(label);
+        return new Result(true, StatusCode.OK, "查询成功", list);
+    }
+
+
+    /**
+     * @Author sirc_hzr
+     * @Description  TODO 根据条件+分页查询标签内容
+     * @Date 10:52 2019/3/6
+     * @Param [label, page, size]
+     * @return com.tensquare.common.domain.Result
+     **/
+
+    @RequestMapping(value = "/search/{page}/{size}", method = RequestMethod.POST)
+    public Result findBySearch(@RequestBody Label label, @PathVariable int page, @PathVariable int size) {
+        Page pageData = labelService.findBySearch(label, page, size);
+        return new Result(true, StatusCode.OK, "查询成功", new PageResult<Label>(pageData.getTotalElements(), pageData.getContent()));
+    }
+
+
 
 }
